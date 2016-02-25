@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">茶码头</string>
+    <string name="module_dynamic">动态</string>
+    <string name="module_doc">百科</string>
+    <string name="module_found">发现</string>
+    <string name="module_home">我的</string>
+</resources>
