@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/page_background" >
-    <apk.lib.widget.RoundFontIconView
+   <!--  <apk.lib.widget.RoundFontIconView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
@@ -31,10 +31,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:currency="{fa-yen}"
-        app:currencySize="14sp"
+        app:currencySize="34sp"
         app:amount="33.22"
-        app:amountSize="20sp"
-        />
+        app:amountSize="44sp"
+        /> 
 
    <LinearLayout
        android:layout_width="match_parent"
@@ -57,5 +57,24 @@
 	        android:textSize="44sp"
 	        android:background="#ffffff"
 	        />
-	</LinearLayout>
+	</LinearLayout> -->
+	<apk.lib.widget.BaseTable
+	    android:id="@+id/baseTable"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    app:columnNumber="4"
+	    app:columnHeight="20dp"
+	    app:tableBackgroundColor="#009944"
+	    android:layout_marginTop="4dp"
+	    app:columnMeter="percent"
+	    android:layout_marginLeft="2dp"
+	    app:lineColor="#f60"
+	    app:hasHeader="true"
+	    app:headerTextSize="16sp"
+	    app:headerBackground="#b6b6b6" 
+		app:headerTextColor="#ffffff"
+		app:headerHeight="40dp"
+	    android:layout_marginRight="2dp"
+	    app:splitLine="true"
+	    />
 </LinearLayout>

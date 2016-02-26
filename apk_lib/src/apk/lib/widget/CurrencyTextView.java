@@ -5,13 +5,9 @@ import com.joanzapata.iconify.widget.IconTextView;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Paint.FontMetrics;
+import android.graphics.Rect;
 import android.util.AttributeSet;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import apk.lib.R;
 /**
@@ -43,10 +39,10 @@ public class CurrencyTextView extends FrameLayout{
 		if(currencyIcon==null||currencyIcon.equals("")){
 			currencyIcon="{fa-cny}";
 		}
-		currencySize=a.getDimension(R.styleable.CurrencyTextView_currencySize, 16)/2;
+		currencySize=a.getDimension(R.styleable.CurrencyTextView_currencySize, 16);
 		currencyColor=a.getColor(R.styleable.CurrencyTextView_currencyColor, Color.BLACK);
 		amount=a.getFloat(R.styleable.CurrencyTextView_amount, 0.0f);
-		amountSize=a.getDimension(R.styleable.CurrencyTextView_amountSize, 24)/2;
+		amountSize=a.getDimension(R.styleable.CurrencyTextView_amountSize, 24);
 		amountColor=a.getColor(R.styleable.CurrencyTextView_amountColor, Color.BLACK);
 		a.recycle();
 	}
@@ -57,24 +53,21 @@ public class CurrencyTextView extends FrameLayout{
 		currencyTextView.setText(currencyIcon);
 		currencyTextView.setTextSize(currencySize);
 		currencyTextView.setTextColor(currencyColor);
-		
-		currencyTextView.setBackgroundColor(Color.WHITE);
+		//currencyTextView.setBackgroundColor(Color.WHITE);
 		FrameLayout.LayoutParams amountLayout=
 				new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,FrameLayout.LayoutParams.WRAP_CONTENT);
 		amountTextView=new TextView(getContext());
 		amountTextView.setText(String.valueOf(amount));
 		amountTextView.setTextSize(amountSize);
 		amountTextView.setTextColor(amountColor);
-		amountTextView.setBackgroundColor(Color.WHITE);
+		//amountTextView.setBackgroundColor(Color.WHITE);
 		currencyTextView.measure(-2, -2);
 		amountLayout.leftMargin=currencyTextView.getMeasuredWidth();
 		amountTextView.measure(-2, -2);
-		FontMetrics fm = amountTextView.getPaint().getFontMetrics();   
-		float size=(float) Math.ceil(fm.descent - fm.ascent);
-		float margin=(amountTextView.getMeasuredHeight()-size);
-		System.out.println(amountTextView.getMeasuredHeight()+":"+size+":"+amountTextView.getPaddingBottom());
-		
-		iconLayout.topMargin=(int) margin;
+		Rect bounds=new Rect();
+		amountTextView.getPaint().getTextBounds(currencyTextView.getText().toString(), 0, 1, bounds);
+		int bottomMargin=(amountTextView.getMeasuredHeight()-bounds.height())/2;
+		iconLayout.topMargin=amountTextView.getMeasuredHeight()-currencyTextView.getMeasuredHeight()-bottomMargin;
 		currencyTextView.setLayoutParams(iconLayout);
 		amountTextView.setLayoutParams(amountLayout);
 		this.addView(currencyTextView);
