@@ -212,15 +212,16 @@ public class BaseTable extends View{
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
-		int rowCount=adapter.getRowCount();
+		//int rowCount=adapter.getRowCount();
 		int lx=0;
 		int ly=0;
 		int oldColor;
 		Paint.Style oldStyle;
 		float oldTextSize;
+		float fontX=0f;
+		float fontY=0f;
+		float startX=0f;
 		if(hasHeader){
-			//绘制表头
-			rowCount++;
 			//绘制背景
 			if(headerBackground!=Color.TRANSPARENT){
 				oldColor=paint.getColor();
@@ -237,7 +238,7 @@ public class BaseTable extends View{
 			oldTextSize=paint.getTextSize();
 			paint.setTextSize(headerTextSize);
 			paint.setColor(headerTextColor);
-			float startX=0f;
+			
 			for(int i=0;i<columnNumber;i++){
 				String headerString=adapter.getHeaderCellString(i);
 				paint.getTextBounds(headerString, 0, headerString.length(), textRect);
@@ -245,16 +246,15 @@ public class BaseTable extends View{
 				if(columnMeter==METER_PERCENT){
 					columnSize=mWidth*(columnSize/100);
 				}
-				//居中方式的fontX
-				float fontX=startX+(columnSize/2-paint.measureText(headerString)/2);
-				/*float offSize=0;
-				if(columnMeter==METER_PERCENT){
-					offSize=mWidth*(columnSize/100)+frontSize;
-					frontSize=offSize;
-				}*/
-				float fontY=headerHeight/2.0f+textRect.height()/2.0f;
-				//float fontX=frontSize+columnSize/2-paint.measureText(headerString)/2;
-			//System.out.println(columnSize+":"+fontX);
+				fontY=headerHeight/2.0f+textRect.height()/2.0f;
+				if(headerTextAlign==ALIGN_LEFT){
+					fontX=startX+headerLeftPadding;
+				}else if(headerTextAlign==ALIGN_RIGHT){
+					fontX=startX+columnSize-headerRightPadding-paint.measureText(headerString);
+				}else{
+					//居中方式的fontX
+					fontX=startX+(columnSize/2-paint.measureText(headerString)/2);
+				}
 				canvas.drawText(headerString,fontX,fontY, paint);
 				startX=startX+columnSize;
 				
@@ -263,42 +263,86 @@ public class BaseTable extends View{
 			paint.setColor(oldColor);
 			ly+=headerHeight;
 		}
-		
-		
-		//System.out.println(mHeight);
-		/*if(splitLine){
-			//画背景
-			if(tableBackgroundColor!=Color.TRANSPARENT){
-				paint.setColor(tableBackgroundColor);
-				Paint.Style s=paint.getStyle();
-				paint.setStyle(Paint.Style.FILL);
-				canvas.drawRect(0, 0,mWidth,mHeight,paint);
-				paint.setStyle(s);
+		//绘制文字
+		if(tableBackgroundColor!=Color.TRANSPARENT){
+			float tableHeight=(adapter.getRowCount())*columnHeight;
+			oldColor=paint.getColor();
+			oldStyle=paint.getStyle();
+			paint.setColor(tableBackgroundColor);
+			paint.setStyle(Paint.Style.FILL);
+			if(hasHeader){
+				tableHeight+=headerHeight;
 			}
-			//画横线
-			paint.setColor(lineColor);
-			paint.setStrokeWidth(1.0f);
-			for(int i=0;i<=rowCount;i++){
-				float h=mHeight/adapter.getRowCount();
-				canvas.drawLine(0,h*i,mWidth,h*i, paint);
-			}
-			//画纵线
-			float pre=0f;
-			for(int i=0;i<columnNumber;i++){
-				canvas.drawLine(0, 0, 0, mHeight, paint);
-				canvas.drawLine(mWidth, 0, mWidth, mHeight, paint);
-				if(i>0&&i<columnNumber){
-					float cw=adapter.getColumnLength(mWidth, i);
-					if(columnMeter==METER_PERCENT){
-						//换算百分比
-						cw=mWidth*(cw/100)+pre;
-						pre=cw;
-					}
-					System.out.println(pre+":"+cw);
-					canvas.drawLine(cw, 0, cw, mHeight, paint);
+			canvas.drawRect(lx,ly, mWidth, tableHeight, paint);
+			paint.setColor(oldColor);
+			paint.setStyle(oldStyle);
+		}
+		fontX=0f;
+		fontY=0f;
+		oldColor=paint.getColor();
+		oldTextSize=paint.getTextSize();
+		paint.setTextSize(headerTextSize);
+		paint.setColor(headerTextColor);
+		for(int row=0;row<adapter.getRowCount();row++){
+			startX=0f;
+			for(int column=0;column<columnNumber;column++){
+				String text=adapter.getCellString(row, column);
+				Rect textRect=new Rect();
+				paint.getTextBounds(text, 0, text.length(), textRect);
+				fontY=columnHeight/2.0f+textRect.height()/2.0f+(columnHeight*row);
+				if(hasHeader){
+					fontY=fontY+headerHeight;
 				}
+				float columnSize=adapter.getColumnLength(mWidth,column);
+				if(columnMeter==METER_PERCENT){
+					columnSize=mWidth*(columnSize/100);
+				}
+				if(cellTextAlign==ALIGN_RIGHT){
+					fontX=startX+columnSize-cellRightPadding-paint.measureText(text);
+				}else if(cellTextAlign==ALIGN_LEFT){
+					fontX=startX+cellLeftPadding;
+				}else{
+					//居中方式的fontX
+					fontX=startX+(columnSize/2-paint.measureText(text)/2);
+				}
+				canvas.drawText(text,fontX,fontY, paint);
+				startX=startX+columnSize;
 			}
-		}*/
+		}
+		paint.setTextSize(oldTextSize);
+		paint.setColor(oldColor);
+		//画线
+		if(splitLine){
+			oldColor=paint.getColor();
+			paint.setColor(lineColor);
+			float strokeWidth=paint.getStrokeMiter();
+			paint.setStrokeWidth(1.0f);
+			//画横线
+			lx=0;
+			ly=0;
+			if(hasHeader){
+				canvas.drawLine(lx, ly,mWidth,ly, paint);
+				ly+=headerHeight;
+			}
+			for(int i=0;i<=adapter.getRowCount();i++){
+				canvas.drawLine(0,ly,mWidth,ly, paint);
+				ly+=columnHeight;
+			}
+			ly-=columnHeight;
+			canvas.drawLine(0, 0, 0, ly, paint);
+			canvas.drawLine(mWidth, 0, mWidth, ly, paint);
+			startX=0;
+			for(int i=0;i<columnNumber;i++){
+				float columnSize=adapter.getColumnLength(mWidth, i);
+				if(columnMeter==METER_PERCENT){
+					columnSize=mWidth*(columnSize/100);
+				}
+				canvas.drawLine(columnSize+startX, 0, columnSize+startX, ly, paint);
+				startX+=columnSize;
+			}
+			paint.setColor(oldColor);
+			paint.setStrokeWidth(strokeWidth);
+		}
 	}
 	public boolean isSplitLine() {
 		return splitLine;

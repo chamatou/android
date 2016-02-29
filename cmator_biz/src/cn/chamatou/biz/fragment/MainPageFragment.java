@@ -10,10 +10,17 @@ public class MainPageFragment extends BaseFragment{
 	private BaseTable table;
 	private BaseTable.TableAdapter adapter;
 	private String[] headerStrings;
+	private String[][] cellString;
 	@Override
 	protected void createPageView(ViewGroup container, Bundle savedInstanceState) {
 		table=findViewById(R.id.baseTable);
 		headerStrings=new String[]{"姓名","年龄","出生日期","备注"};
+		cellString=new String[4][4];
+		for(int i=0;i<cellString.length;i++){
+			for(int n=0;n<cellString.length;n++){
+				cellString[i][n]="item:"+i+":"+n;
+			}
+		}
 		adapter =new BaseTable.TableAdapter() {
 			
 			@Override
@@ -33,7 +40,7 @@ public class MainPageFragment extends BaseFragment{
 			
 			@Override
 			public String getCellString(int row, int column) {
-				return null;
+				return cellString[row][column];
 			}
 		};
 		table.setAdapter(adapter);
